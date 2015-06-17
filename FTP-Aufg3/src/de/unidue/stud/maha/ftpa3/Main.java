@@ -3,7 +3,6 @@
  */
 package de.unidue.stud.maha.ftpa3;
 
-import SoFTlib.Node;
 import SoFTlib.SoFT;
 
 /**
@@ -12,7 +11,7 @@ import SoFTlib.SoFT;
  */
 public class Main extends SoFT {
 	
-	public Integer m=0; //Anzahl Knoten gesamt, von Eingabezeile gelesen
+	public static Integer m=0; //Anzahl Knoten gesamt, von Eingabezeile gelesen
 	public Integer F=0; //Anzahl fehlerhafte Knoten, von Eingabezeile gelesen
 	public String[] initialWords = new String[m]; //Wörter als Anfangswerte der Knoten, von Eingabezeile gelesen
 	public Integer d=0; //Dauer der Protokoll-Phase
@@ -28,7 +27,7 @@ public class Main extends SoFT {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Node[] nodes = { new Node() };
+		Node[] nodes = { new Node(m) };
 		new Main().runSystem(nodes, "Signed Messages Protokoll", "Aufgabe 3", "Marc Gesthüsen, Hanno - Felix Wagner");
 	}
 	
