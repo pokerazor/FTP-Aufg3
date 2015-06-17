@@ -36,10 +36,11 @@ public class Main extends SoFT {
 	}
 
 	public int result(String input, String[] output) {
+		initialized=false;
 		Integer resultVal = -1;
 
 		this.getSummary();
-		
+
 		if (false) {
 			resultVal = 0; // wenn IC1 und IC2 erfüllt sind (d.h. Übereinstimmung erreicht worden ist)
 		} else if (false) {
@@ -50,30 +51,36 @@ public class Main extends SoFT {
 			resultVal = 3; // wenn nur IC1 erfüllt ist,
 		} else {
 			resultVal = 4; // else
-			System.out.println(this.getSummary());
-
 		}
 
-		if (exec() > NUMBER_OF_RUNS) {
+		if (exec() > NUMBER_OF_RUNS || output[0].equals(Node.MESSAGE_INVALID)) {
 			resultVal = 5; // NUMBER_OF_RUNS reached, terminating
 			notifyOfEnd();
 		}
 		return resultVal;
 	}
 
-	public synchronized void parseInputLine(String input) {
+	public synchronized Boolean parseInputLine(String input) {
 		if (!initialized) {
 			inputLine = input;
+			Integer wordCount = getWordCount(inputLine, 1);
 
 			m = number(word(inputLine, 1));
 			F = number(word(inputLine, 2));
-			majorityShare=(m/2);
+			
+			if(wordCount<4 || m<2 || wordCount-2!=m || F>m){ // no sense in less than 2 nodes, check if number of inputs matches number of words, not too many faulty nodes
+				return false;
+			}
+			
+			majorityShare = (m / 2);
 			initialWords = new String[m];
 			for (int i = 0; i < initialWords.length; i++) {
-				initialWords[i] = word(inputLine, 2 + i); // create maximum number of nodes, because we can't read the input line before running the experiment. WHY IS THIS SUCH A pita?!
+				initialWords[i] = word(inputLine, 3 + i); // create maximum number of nodes, because we can't read the input line before running the experiment. WHY IS THIS SUCH A pita?!
 			}
+
 			initialized = true;
 		}
+		return initialized;
 	}
 
 	public void notifyOfEnd() {

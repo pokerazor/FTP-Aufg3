@@ -14,7 +14,8 @@ public class Node extends SoFTlib.Node {
 	private static final String CHAR_FAULTY = "-"; // Zeichen für fehlerhaften Knoten
 	private static final String CHAR_TIE = "?"; // Zeichen für keine Mehrheit vorhanden/Unentschieden
 	private static final String CHAR_GLUE = " "; // Zeichen für keine Mehrheit vorhanden/Unentschieden
-	private static final String MESSAGE_SUPERFLUOUS = "I am superfluous, terminating.";
+	public static final String MESSAGE_SUPERFLUOUS = "I am superfluous, terminating.";
+	public static final String MESSAGE_INVALID = "Input line invalid, terminating.";
 	private String initialWord = "";
 	private String finalValue = CHAR_TIE;
 
@@ -27,7 +28,10 @@ public class Node extends SoFTlib.Node {
 
 	public String runNode(String input) throws SoFTException {
 		String output = "";
-		experiment.parseInputLine(input);
+		if(!experiment.parseInputLine(input)){
+			say(MESSAGE_INVALID);
+			return MESSAGE_INVALID;
+		}
 		if (myIndex() > experiment.m - 1) { // terminate nodes which are not necessary
 			say(MESSAGE_SUPERFLUOUS);
 			return MESSAGE_SUPERFLUOUS;
@@ -38,6 +42,7 @@ public class Node extends SoFTlib.Node {
 			k[x] = CHAR_TIE;
 		}
 		initialWord = experiment.initialWords[myIndex()];
+
 		k[myIndex()] = initialWord;
 
 		finalValue=Mehrheit(k);
