@@ -48,20 +48,23 @@ public class Main extends SoFT {
 			summary += i + ":\"" + curOutput + "\" ";
 
 		}
+		
+		summary+=fault(0) + " m =" + m + " F =" + F + " majorityShare =" + majorityShare;
+				
+		Boolean IC1 = checkIC1(getIntegrityGroup(), output);
+		Boolean IC2 = checkIC2();
 
-		setSummary(fault(0) + " m =" + m + " F =" + F + " majorityShare =" + majorityShare + "\n" + summary);
+		summary+=IC1 + " " + IC2;
+		
+		setSummary(summary);
 
-		String[] foo = explodeWords(output[0]);
-
-		setSummary(foo[0] + "");
-
-		if (false) {
+		if (IC1 && IC2) {
 			resultVal = 0; // wenn IC1 und IC2 erfüllt sind (d.h. Übereinstimmung erreicht worden ist)
-		} else if (false) {
+		} else if (IC1) {
 			resultVal = 1; // wenn nur IC1 erfüllt ist,
-		} else if (false) {
+		} else if (IC2) {
 			resultVal = 2; // wenn nur IC2 erfüllt ist,
-		} else if (false) {
+		} else if (!IC1 && !IC2) {
 			resultVal = 3; // wenn IC1 und IC2 verletzt sind
 		} else {
 			resultVal = 4; // else, in komischen fällen
@@ -82,25 +85,60 @@ public class Main extends SoFT {
 		return faultVector;
 	}
 
+	public Boolean checkIC1(String integrityGroup, String outputs[]) {
+		String sameVector = null;
+		Boolean result = false;
+		for (int i = 0; i < outputs.length; i++) {
+			String curOutput = outputs[i];
+
+			char checkNode = nodeChr(i);
+
+			if (curOutput.equals(Node.MESSAGE_SUPERFLUOUS)) { // if the node feels superfluous, don't give a shit an his result
+				continue;
+			}
+
+			if (and(checkNode + "", integrityGroup).equals(checkNode + "")) { // currently probed node is part of the integrity group
+				if (sameVector == null) {
+					sameVector = curOutput;
+					result = true;
+				} else {
+					if (curOutput.equals(sameVector)) {
+						result = true;
+					} else {
+						result = false;
+					}
+				}
+				if (result == false) {
+					return result;
+				}
+			}
+		}
+		return result;
+	}
+
+	public Boolean checkIC2() {
+		return false;
+	}
+
 	public Boolean[] getIntegrityVector() {
 		Integer[] faultVector = getFaultVector();
 
 		Boolean[] integrityVector = new Boolean[faultVector.length];
 		for (int i = 0; i < m; i++) {
-			integrityVector[i] = faultVector[i]==0; //if node is faultless, return true integrity
+			integrityVector[i] = faultVector[i] == 0; // if node is faultless, return true integrity
 		}
 		return integrityVector;
 	}
-	
-	public String getIntegrityGroupString(){
+
+	public String getIntegrityGroup() {
 		Integer[] faultVector = getFaultVector();
-		String integrityGroupString="";
+		String integrityGroup = "";
 		for (int i = 0; i < m; i++) {
-			if(faultVector[i]==0){
-				or(integrityGroupString,nodeChr (i)+""); //add node char to list of faultless noodes
+			if (faultVector[i] == 0) {
+				integrityGroup = or(integrityGroup, nodeChr(i) + ""); // add node char to list of faultless noodes
 			}
 		}
-		return integrityGroupString;
+		return integrityGroup;
 	}
 
 	public synchronized Boolean parseInputLine(String input) {
@@ -108,10 +146,14 @@ public class Main extends SoFT {
 			inputLine = input;
 			Integer wordCount = getWordCount(inputLine, 1);
 
+			if (wordCount < 4) { // no sense in less than 2 nodes
+				return false;
+			}
+
 			m = number(word(inputLine, 1));
 			F = number(word(inputLine, 2));
 
-			if (wordCount < 4 || m < 2 || wordCount - 2 != m || F > m) { // no sense in less than 2 nodes, check if number of inputs matches number of words, not too many faulty nodes
+			if (m < 2 || wordCount - 2 != m || F > m) { // check if number of inputs matches number of words, not too many faulty nodes
 				return false;
 			}
 
