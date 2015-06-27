@@ -6,7 +6,7 @@ package de.unidue.stud.maha.ftpa3;
 import static SoFTlib.Helper.*;
 import SoFTlib.SoFT;
 
-/** @author Marc Gesthüsen, Hanno - Felix Wagner */
+/** @author Marc Gesthï¿½sen, Hanno - Felix Wagner */
 public class Main extends SoFT {
 
 	// TEST INPUT LINE 4 1 rot orange gruen orange
@@ -14,7 +14,9 @@ public class Main extends SoFT {
 	public Integer m = 0; // Anzahl Knoten gesamt, von Eingabezeile gelesen
 	public Integer majorityShare = 0; // m/2
 	public Integer F = 0; // Anzahl fehlerhafte Knoten, von Eingabezeile gelesen
-	public String[] initialWords = new String[m]; // Wörter als Anfangswerte der Knoten, von Eingabezeile gelesen
+	public String[] initialWords = new String[m]; // Wï¿½rter als Anfangswerte der
+													// Knoten, von Eingabezeile
+													// gelesen
 	public Integer d = 0; // Dauer der Protokoll-Phase
 	public String inputLine = "";
 	public static Boolean initialized = false;
@@ -29,14 +31,21 @@ public class Main extends SoFT {
 	public static void main(String[] args) {
 		Main expriment = new Main();
 		for (int i = 0; i < nodes.length; i++) {
-			nodes[i] = new Node(expriment); // create maximum number of nodes, because we can't read the input line before running the experiment. WHY IS THIS SUCH A pita?!
+			nodes[i] = new Node(expriment); // create maximum number of
+												// nodes, because we can't read
+												// the input line before running
+												// the experiment. WHY IS THIS
+												// SUCH A pita?!
 		}
 
-		expriment.runSystem(nodes, "Signed Messages Protokoll", "Aufgabe 3", "Marc Gesthüsen, Hanno - Felix Wagner");
+		expriment.runSystem(nodes, "Signed Messages Protokoll", "Aufgabe 3",
+				"Marc Gesthï¿½sen, Hanno - Felix Wagner");
 	}
 
-	// IC1: Alle fehlerfreien Knoten terminieren mit dem gleichen Konsistenzvektor
-	// IC2: Wenn der Erzeuger fehlerfrei ist, dann wird sein Anfangswert von jedem fehlerfreien Knoten in den Konsistenzvektor übernommen
+	// IC1: Alle fehlerfreien Knoten terminieren mit dem gleichen
+	// Konsistenzvektor
+	// IC2: Wenn der Erzeuger fehlerfrei ist, dann wird sein Anfangswert von
+	// jedem fehlerfreien Knoten in den Konsistenzvektor ï¿½bernommen
 	public int result(String input, String[] output) {
 		initialized = false;
 		Integer resultVal = -1;
@@ -48,26 +57,28 @@ public class Main extends SoFT {
 			summary += i + ":\"" + curOutput + "\" ";
 
 		}
-		
-		summary+=fault(0) + " m =" + m + " F =" + F + " majorityShare =" + majorityShare;
-				
+
+		summary += fault(0) + " m =" + m + " F =" + F + " majorityShare ="
+				+ majorityShare;
+
 		Boolean IC1 = checkIC1(getIntegrityGroup(), output);
 		Boolean IC2 = checkIC2();
 
-		summary+=IC1 + " " + IC2;
-		
+		summary += IC1 + " " + IC2;
+
 		setSummary(summary);
 
 		if (IC1 && IC2) {
-			resultVal = 0; // wenn IC1 und IC2 erfüllt sind (d.h. Übereinstimmung erreicht worden ist)
+			resultVal = 0; // wenn IC1 und IC2 erfï¿½llt sind (d.h.
+							// ï¿½bereinstimmung erreicht worden ist)
 		} else if (IC1) {
-			resultVal = 1; // wenn nur IC1 erfüllt ist,
+			resultVal = 1; // wenn nur IC1 erfï¿½llt ist,
 		} else if (IC2) {
-			resultVal = 2; // wenn nur IC2 erfüllt ist,
+			resultVal = 2; // wenn nur IC2 erfï¿½llt ist,
 		} else if (!IC1 && !IC2) {
 			resultVal = 3; // wenn IC1 und IC2 verletzt sind
 		} else {
-			resultVal = 4; // else, in komischen fällen
+			resultVal = 4; // else, in komischen fï¿½llen
 		}
 
 		if (exec() > NUMBER_OF_RUNS || output[0].equals(Node.MESSAGE_INVALID)) {
@@ -93,11 +104,24 @@ public class Main extends SoFT {
 
 			char checkNode = nodeChr(i);
 
-			if (curOutput.equals(Node.MESSAGE_SUPERFLUOUS)) { // if the node feels superfluous, don't give a shit an his result
+			if (curOutput.equals(Node.MESSAGE_SUPERFLUOUS)) { // if the node
+																// feels
+																// superfluous,
+																// don't give a
+																// shit an his
+																// result
 				continue;
 			}
 
-			if (and(checkNode + "", integrityGroup).equals(checkNode + "")) { // currently probed node is part of the integrity group
+			if (and(checkNode + "", integrityGroup).equals(checkNode + "")) { // currently
+																				// probed
+																				// node
+																				// is
+																				// part
+																				// of
+																				// the
+																				// integrity
+																				// group
 				if (sameVector == null) {
 					sameVector = curOutput;
 					result = true;
@@ -125,7 +149,8 @@ public class Main extends SoFT {
 
 		Boolean[] integrityVector = new Boolean[faultVector.length];
 		for (int i = 0; i < m; i++) {
-			integrityVector[i] = faultVector[i] == 0; // if node is faultless, return true integrity
+			integrityVector[i] = faultVector[i] == 0; // if node is faultless,
+														// return true integrity
 		}
 		return integrityVector;
 	}
@@ -135,7 +160,14 @@ public class Main extends SoFT {
 		String integrityGroup = "";
 		for (int i = 0; i < m; i++) {
 			if (faultVector[i] == 0) {
-				integrityGroup = or(integrityGroup, nodeChr(i) + ""); // add node char to list of faultless noodes
+				integrityGroup = or(integrityGroup, nodeChr(i) + ""); // add
+																		// node
+																		// char
+																		// to
+																		// list
+																		// of
+																		// faultless
+																		// noodes
 			}
 		}
 		return integrityGroup;
@@ -153,18 +185,20 @@ public class Main extends SoFT {
 			m = number(word(inputLine, 1));
 			F = number(word(inputLine, 2));
 
-			if (m < 2 || wordCount - 2 != m || F > m) { // check if number of inputs matches number of words, not too many faulty nodes
+			if (m < 2 || wordCount - 2 != m || F > m) { // check if number of
+														// inputs matches number
+														// of words, not too
+														// many faulty nodes
 				return false;
 			}
 
 			majorityShare = (m / 2);
 			initialWords = explodeWords(inputLine, 3);
 			/*
-			initialWords = new String[m];
-			for (int i = 0; i < initialWords.length; i++) {
-				initialWords[i] = word(inputLine, 3 + i); 
-			}
-			*/
+			 * initialWords = new String[m]; for (int i = 0; i <
+			 * initialWords.length; i++) { initialWords[i] = word(inputLine, 3 +
+			 * i); }
+			 */
 
 			initialized = true;
 		}
