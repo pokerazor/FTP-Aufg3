@@ -3,6 +3,7 @@
  */
 package de.unidue.stud.maha.ftpa3;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import SoFTlib.Msg;
@@ -47,24 +48,6 @@ public class Node extends SoFTlib.Node {
 		return targets;
 	}
 
-	private String getSignatur(String msg) {
-		String[] array = msg.split(":");
-		String signaturen = "";
-		for (int i = 1; i < msg.length(); i++) {
-			signaturen += array[i];
-		}
-		return signaturen;
-	}
-
-	private String getMessage(String msg) {
-		String[] array = msg.split(":");
-		return array[0];
-	}
-
-	private String addSignatur(String msg) {
-		return msg + ":" + e;
-	}
-
 	public String runNode(String input) throws SoFTException {
 		String output = "";
 		if (!experiment.parseInputLine(input)) {
@@ -87,16 +70,25 @@ public class Node extends SoFTlib.Node {
 
 		String neighbors = getNeighborNodes();
 
-		if (e == 1) {
-			form('n', initialWord).send(neighbors);
-		}
-
+		form('n', initialWord).sign().send(neighbors);
 		currentPhase = 1;
 
 		for (int i = currentPhase; i <= experiment.F + 1; i++) {
-			Msg receive = receive(neighbors, 'n', experiment.d * currentPhase);
-			if (receive != null) {
-
+			for (int j = 0; j < neighbors.length(); j++) {
+				Msg receive = receive(neighbors, 'n', experiment.d
+						* currentPhase);
+				if (receive != null) {
+					int index = getCreatorIndex(receive);
+					if (k[index] == CHAR_TIE) {
+						k[index] = receive.getCo();
+					} else {
+						k[index] = CHAR_FAULTY;
+					}
+					if (i < experiment.F + 1) {
+						form('n', receive.getCo()).sign().send(
+								getNewNeighbors(receive));
+					}
+				}
 			}
 		}
 
@@ -104,6 +96,22 @@ public class Node extends SoFTlib.Node {
 
 		output = buildOutput();
 		return output;
+	}
+
+	private int getCreatorIndex(Msg receivedMsg) {
+		String signatur = receivedMsg.getSi();
+		char creator = signatur.charAt(0);
+		int index = possible_nodes.indexOf(creator);
+		return index;
+	}
+
+	private String getNewNeighbors(Msg receivedMsg) {
+		String neighbors = getNeighborNodes();
+		String signatur = receivedMsg.getSi();
+		for (int i = 0; i < signatur.length(); i++) {
+			neighbors.replaceAll("" + signatur.charAt(i), "");
+		}
+		return neighbors;
 	}
 
 	private String Mehrheit(String[] k) {
