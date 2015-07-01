@@ -3,7 +3,6 @@
  */
 package de.unidue.stud.maha.ftpa3;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 
 import SoFTlib.Msg;
@@ -18,6 +17,10 @@ public class Node extends SoFTlib.Node {
 												// vorhanden/Unentschieden
 	private static final String CHAR_GLUE = " "; // Zeichen f�r keine Mehrheit
 													// vorhanden/Unentschieden
+
+	private static final String CHAR_MORE = "*"; // Schon mehrere Werte
+													// empfangen
+
 	public static final String MESSAGE_SUPERFLUOUS = "I am superfluous, terminating.";
 	public static final String MESSAGE_INVALID = "Input line invalid, terminating.";
 
@@ -25,8 +28,8 @@ public class Node extends SoFTlib.Node {
 	private String initialWord = ""; // wj
 	private String finalValue = CHAR_TIE;
 	private Integer currentPhase = 0; // i
-	private Integer e = myIndex(); // von Rechner Re wird eine Nachricht
-									// empfangen
+	private Integer e; // von Rechner Re wird eine Nachricht
+						// empfangen
 
 	private String possible_nodes = "ABCDEFGHIJ";
 
@@ -43,12 +46,13 @@ public class Node extends SoFTlib.Node {
 	 * @return
 	 */
 	private String getNeighborNodes() {
-		String targets = possible_nodes.substring(0, experiment.m - 1);
+		String targets = possible_nodes.substring(0, experiment.m);
 		targets = targets.replace("" + myChar(), "");
 		return targets;
 	}
 
 	public String runNode(String input) throws SoFTException {
+		e = myIndex();
 		String output = "";
 		if (!experiment.parseInputLine(input)) {
 			say(MESSAGE_INVALID);
@@ -74,6 +78,7 @@ public class Node extends SoFTlib.Node {
 		currentPhase = 1;
 
 		for (int i = currentPhase; i <= experiment.F + 1; i++) {
+			say("Phase " + i);
 			for (int j = 0; j < neighbors.length(); j++) {
 				Msg receive = receive(neighbors, 'n', experiment.d
 						* currentPhase);
@@ -82,13 +87,20 @@ public class Node extends SoFTlib.Node {
 					if (k[index] == CHAR_TIE) {
 						k[index] = receive.getCo();
 					} else {
-						k[index] = CHAR_FAULTY;
+						if (k[index] != receive.getCo())
+							k[index] = CHAR_MORE;
 					}
 					if (i < experiment.F + 1) {
 						form('n', receive.getCo()).sign().send(
 								getNewNeighbors(receive));
 					}
 				}
+			}
+		}
+
+		for (int i = 0; i < k.length; i++) {
+			if (k[i] == CHAR_MORE || k[i] == CHAR_TIE) {
+				k[i] = CHAR_FAULTY;
 			}
 		}
 
@@ -109,7 +121,7 @@ public class Node extends SoFTlib.Node {
 		String neighbors = getNeighborNodes();
 		String signatur = receivedMsg.getSi();
 		for (int i = 0; i < signatur.length(); i++) {
-			neighbors.replaceAll("" + signatur.charAt(i), "");
+			neighbors = neighbors.replace("" + signatur.charAt(i), "");
 		}
 		return neighbors;
 	}

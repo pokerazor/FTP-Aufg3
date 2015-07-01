@@ -17,7 +17,7 @@ public class Main extends SoFT {
 	public String[] initialWords = new String[m]; // W�rter als Anfangswerte der
 													// Knoten, von Eingabezeile
 													// gelesen
-	public Integer d = 0; // Dauer der Protokoll-Phase
+	public Integer d = 50; // Dauer der Protokoll-Phase
 	public String inputLine = "";
 	public static Boolean initialized = false;
 	public static final Integer NUMBER_OF_RUNS = 1000;
