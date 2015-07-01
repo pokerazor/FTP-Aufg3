@@ -66,7 +66,7 @@ public class Node extends SoFTlib.Node {
 
 		k = new String[experiment.m];
 		for (int x = 0; x < k.length; x++) { // initialize consistency vector
-			k[x] = CHAR_TIE;
+			k[x] = CHAR_GLUE;
 		}
 		initialWord = experiment.initialWords[e];
 
@@ -84,7 +84,7 @@ public class Node extends SoFTlib.Node {
 						* currentPhase);
 				if (receive != null) {
 					int index = getCreatorIndex(receive);
-					if (k[index] == CHAR_TIE) {
+					if (k[index] == CHAR_GLUE) {
 						k[index] = receive.getCo();
 					} else {
 						if (k[index] != receive.getCo())
@@ -99,7 +99,7 @@ public class Node extends SoFTlib.Node {
 		}
 
 		for (int i = 0; i < k.length; i++) {
-			if (k[i] == CHAR_MORE || k[i] == CHAR_TIE) {
+			if (k[i] == CHAR_MORE || k[i] == CHAR_GLUE) {
 				k[i] = CHAR_FAULTY;
 			}
 		}
