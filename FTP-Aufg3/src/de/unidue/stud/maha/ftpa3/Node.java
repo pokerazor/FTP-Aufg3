@@ -40,11 +40,9 @@ public class Node extends SoFTlib.Node {
 		this.experiment = owner;
 	}
 
-	/**
-	 * returns neighbor nodes as String
+	/** returns neighbor nodes as String
 	 * 
-	 * @return
-	 */
+	 * @return */
 	private String getNeighborNodes() {
 		String targets = possible_nodes.substring(0, experiment.m);
 		targets = targets.replace("" + myChar(), "");
@@ -79,20 +77,18 @@ public class Node extends SoFTlib.Node {
 
 		for (int i = currentPhase; i <= experiment.F + 1; i++) {
 			for (int j = 0; j < neighbors.length(); j++) {
-				Msg receive = receive(neighbors, 'n', experiment.d
-						* currentPhase);
+				Msg receive = receive(neighbors, 'n', experiment.d * currentPhase);
 				if (receive != null) {
 					int index = getCreatorIndex(receive);
 					if (k[index].equals(CHAR_GLUE)) {
 						k[index] = receive.getCo();
 					} else {
-						say(""+k[index]+ " "+receive.getCo());
+						say("" + k[index] + " " + receive.getCo());
 						if (!k[index].equals(receive.getCo()))
 							k[index] = CHAR_MORE;
 					}
 					if (i < experiment.F + 1) {
-						form('n', receive.getCo()).sign().send(
-								getNewNeighbors(receive));
+						form('n', receive.getCo()).sign().send(getNewNeighbors(receive));
 					}
 				}
 			}
@@ -111,9 +107,12 @@ public class Node extends SoFTlib.Node {
 	}
 
 	private int getCreatorIndex(Msg receivedMsg) {
+		int index = 0;
 		String signatur = receivedMsg.getSi();
-		char creator = signatur.charAt(0);
-		int index = possible_nodes.indexOf(creator);
+		if (signatur.length() > 0) { //FIXME only quick fix: what if the Message is faulty and there is no signature?!
+			char creator = signatur.charAt(0);
+			index = possible_nodes.indexOf(creator);
+		}
 		return index;
 	}
 

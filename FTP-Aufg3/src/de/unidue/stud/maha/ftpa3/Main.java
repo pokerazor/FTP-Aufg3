@@ -32,14 +32,13 @@ public class Main extends SoFT {
 		Main expriment = new Main();
 		for (int i = 0; i < nodes.length; i++) {
 			nodes[i] = new Node(expriment); // create maximum number of
-												// nodes, because we can't read
-												// the input line before running
-												// the experiment. WHY IS THIS
-												// SUCH A pita?!
+											// nodes, because we can't read
+											// the input line before running
+											// the experiment. WHY IS THIS
+											// SUCH A pita?!
 		}
 
-		expriment.runSystem(nodes, "Signed Messages Protokoll", "Aufgabe 3",
-				"Marc Gesth�sen, Hanno - Felix Wagner");
+		expriment.runSystem(nodes, "Signed Messages Protokoll", "Aufgabe 3", "Marc Gesth�sen, Hanno - Felix Wagner");
 	}
 
 	// IC1: Alle fehlerfreien Knoten terminieren mit dem gleichen
@@ -58,11 +57,10 @@ public class Main extends SoFT {
 
 		}
 
-		summary += fault(0) + " m =" + m + " F =" + F + " majorityShare ="
-				+ majorityShare;
+		summary += fault(0) + " m =" + m + " F =" + F + " majorityShare =" + majorityShare;
 
 		Boolean IC1 = checkIC1(getIntegrityGroup(), output);
-		Boolean IC2 = checkIC2();
+		Boolean IC2 = checkIC2(getIntegrityGroup(), output);
 
 		summary += IC1 + " " + IC2;
 
@@ -140,8 +138,35 @@ public class Main extends SoFT {
 		return result;
 	}
 
-	public Boolean checkIC2() {
-		return false;
+	public Boolean checkIC2(String integrityGroup, String outputs[]) {
+		Boolean result = true;
+
+		for (int i = 0; i < outputs.length; i++) {  //loop all nodes
+			String curOutput = outputs[i];
+
+			char checkNode = nodeChr(i);
+
+			if (curOutput.equals(Node.MESSAGE_SUPERFLUOUS)) { // if the node feels superfluous, don't give a shit an his result
+				continue;
+			}
+
+			if (and(checkNode + "", integrityGroup).equals(checkNode + "")) { // currently probed node is part of the integrity group
+				for (int j = 0; j < outputs.length; j++) { // loop all nodes again
+					String curInput = initialWords[j]; //look at it's input
+
+					if (outputs[j].equals(Node.MESSAGE_SUPERFLUOUS)) { // if the node feels superfluous, don't compare his input
+						continue;
+					}
+					if (!word(curOutput, j).equals(curInput)) { //if the input of the inner looped node doesn't match the outer's output at the corresponding position
+						result = false;
+						return result;
+					}
+
+				}
+			}
+
+		}
+		return result;
 	}
 
 	public Boolean[] getIntegrityVector() {
@@ -155,6 +180,9 @@ public class Main extends SoFT {
 		return integrityVector;
 	}
 
+/*
+ * return list (of chars) of all nodes, wich are faultless (as configured in the GUI)
+ */
 	public String getIntegrityGroup() {
 		Integer[] faultVector = getFaultVector();
 		String integrityGroup = "";
