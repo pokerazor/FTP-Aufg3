@@ -84,10 +84,10 @@ public class Node extends SoFTlib.Node {
 						* currentPhase);
 				if (receive != null) {
 					int index = getCreatorIndex(receive);
-					if (k[index] == CHAR_GLUE) {
+					if (k[index].equals(CHAR_GLUE)) {
 						k[index] = receive.getCo();
 					} else {
-						if (k[index] != receive.getCo())
+						if (k[index].equals(receive.getCo()))
 							k[index] = CHAR_MORE;
 					}
 					if (i < experiment.F + 1) {
