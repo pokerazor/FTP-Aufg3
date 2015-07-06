@@ -78,7 +78,6 @@ public class Node extends SoFTlib.Node {
 		currentPhase = 1;
 
 		for (int i = currentPhase; i <= experiment.F + 1; i++) {
-			say("Phase " + i);
 			for (int j = 0; j < neighbors.length(); j++) {
 				Msg receive = receive(neighbors, 'n', experiment.d
 						* currentPhase);
@@ -87,7 +86,8 @@ public class Node extends SoFTlib.Node {
 					if (k[index].equals(CHAR_GLUE)) {
 						k[index] = receive.getCo();
 					} else {
-						if (k[index].equals(receive.getCo()))
+						say(""+k[index]+ " "+receive.getCo());
+						if (!k[index].equals(receive.getCo()))
 							k[index] = CHAR_MORE;
 					}
 					if (i < experiment.F + 1) {
