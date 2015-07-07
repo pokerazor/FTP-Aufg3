@@ -40,9 +40,11 @@ public class Node extends SoFTlib.Node {
 		this.experiment = owner;
 	}
 
-	/** returns neighbor nodes as String
+	/**
+	 * returns neighbor nodes as String
 	 * 
-	 * @return */
+	 * @return
+	 */
 	private String getNeighborNodes() {
 		String targets = possible_nodes.substring(0, experiment.m);
 		targets = targets.replace("" + myChar(), "");
@@ -77,18 +79,33 @@ public class Node extends SoFTlib.Node {
 
 		for (int i = currentPhase; i <= experiment.F + 1; i++) {
 			for (int j = 0; j < neighbors.length(); j++) {
-				Msg receive = receive(neighbors, 'n', experiment.d * currentPhase);
+				Msg receive = receive(neighbors, 'n', experiment.d
+						* currentPhase);
 				if (receive != null) {
-					int index = getCreatorIndex(receive);
-					if (k[index].equals(CHAR_GLUE)) {
-						k[index] = receive.getCo();
-					} else {
-						say("" + k[index] + " " + receive.getCo());
-						if (!k[index].equals(receive.getCo()))
-							k[index] = CHAR_MORE;
+					if (!getNewNeighbors(receive).isEmpty()) {
+						if (i < experiment.F + 1) {
+							form('n', receive.getCo()).sign().send(
+									getNewNeighbors(receive));
+						}
 					}
-					if (i < experiment.F + 1) {
-						form('n', receive.getCo()).sign().send(getNewNeighbors(receive));
+					if (!receive.getSi().isEmpty()
+							&& !receive.getCo().isEmpty()) {
+						for (int h = 0; h < receive.getSi().length(); h++) {
+							char node = receive.getSi().charAt(h);
+							int index = getIndex(node);
+							if (checkSig(receive, node)) {
+								if (k[index].equals(CHAR_GLUE)) {
+									k[index] = receive.getCo();
+								} else {
+									if (!k[index].equals(receive.getCo()))
+										k[index] = CHAR_MORE;
+								}
+							} else {
+								k[index] = CHAR_MORE;
+							}
+						}
+					} else {
+						k[getIndex(receive.getSe())] = CHAR_MORE;
 					}
 				}
 			}
@@ -106,14 +123,22 @@ public class Node extends SoFTlib.Node {
 		return output;
 	}
 
-	private int getCreatorIndex(Msg receivedMsg) {
-		int index = 0;
-		String signatur = receivedMsg.getSi();
-		if (signatur.length() > 0) { //FIXME only quick fix: what if the Message is faulty and there is no signature?!
-			char creator = signatur.charAt(0);
-			index = possible_nodes.indexOf(creator);
-		}
+	private int getIndex(char sender) {
+		int index = -1;
+		index = possible_nodes.indexOf(sender);
 		return index;
+	}
+
+	private boolean checkSig(Msg receivedMsg, char node) {
+		String signatur = receivedMsg.getSi();
+		int count = 0;
+		for (int i = 0; i < signatur.length(); i++) {
+			if (signatur.charAt(i) == node)
+				count++;
+		}
+		if (count > 1)
+			return false;
+		return true;
 	}
 
 	private String getNewNeighbors(Msg receivedMsg) {

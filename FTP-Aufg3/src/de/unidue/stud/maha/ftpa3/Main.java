@@ -38,7 +38,7 @@ public class Main extends SoFT {
 											// SUCH A pita?!
 		}
 
-		expriment.runSystem(nodes, "Signed Messages Protokoll", "Aufgabe 3", "Marc Gesth�sen, Hanno - Felix Wagner");
+		expriment.runSystem(nodes, "Signed Messages Protokoll", "Aufgabe 3", "Marc Gesthuesen, Hanno - Felix Wagner");
 	}
 
 	// IC1: Alle fehlerfreien Knoten terminieren mit dem gleichen
