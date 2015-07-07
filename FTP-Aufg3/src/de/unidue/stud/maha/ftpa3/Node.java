@@ -82,30 +82,23 @@ public class Node extends SoFTlib.Node {
 				Msg receive = receive(neighbors, 'n', experiment.d
 						* currentPhase);
 				if (receive != null) {
-					if (!getNewNeighbors(receive).isEmpty()) {
-						if (i < experiment.F + 1) {
-							form('n', receive.getCo()).sign().send(
-									getNewNeighbors(receive));
-						}
-					}
-					if (!receive.getSi().isEmpty()
-							&& !receive.getCo().isEmpty()) {
-						for (int h = 0; h < receive.getSi().length(); h++) {
-							char node = receive.getSi().charAt(h);
-							int index = getIndex(node);
-							if (checkSig(receive, node)) {
-								if (k[index].equals(CHAR_GLUE)) {
-									k[index] = receive.getCo();
-								} else {
-									if (!k[index].equals(receive.getCo()))
-										k[index] = CHAR_MORE;
-								}
+					if (checkSig(receive)) {
+						if (!receive.getSi().isEmpty()
+								&& !receive.getCo().isEmpty()) {
+							int index = getIndex(receive.getSe());
+							if (k[index].equals(CHAR_GLUE)) {
+								k[index] = receive.getCo();
 							} else {
-								k[index] = CHAR_MORE;
+								if (!k[index].equals(receive.getCo()))
+									k[index] = CHAR_MORE;
 							}
 						}
-					} else {
-						k[getIndex(receive.getSe())] = CHAR_MORE;
+						if (!getNewNeighbors(receive).isEmpty()) {
+							if (i < experiment.F + 1) {
+								form('n', receive.getCo()).sign().send(
+										getNewNeighbors(receive));
+							}
+						}
 					}
 				}
 			}
@@ -129,15 +122,24 @@ public class Node extends SoFTlib.Node {
 		return index;
 	}
 
-	private boolean checkSig(Msg receivedMsg, char node) {
+	private boolean checkSig(Msg receivedMsg) {
 		String signatur = receivedMsg.getSi();
-		int count = 0;
+		String neighbors = getNeighborNodes();
 		for (int i = 0; i < signatur.length(); i++) {
-			if (signatur.charAt(i) == node)
-				count++;
+			int count = 0;
+			char sig = signatur.charAt(i);
+			if (neighbors.contains("" + sig)) {
+				for (int j = 0; j < neighbors.length(); j++) {
+					char neighbor = neighbors.charAt(j);
+					if (sig == neighbor)
+						count++;
+					if (count > 1)
+						return false;
+				}
+			} else {
+				return false;
+			}
 		}
-		if (count > 1)
-			return false;
 		return true;
 	}
 
